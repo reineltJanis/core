@@ -4,35 +4,37 @@ ENV HOME /root
 
 CMD ["/sbin/my_init"]
 
-COPY --chown=app:app src/core /home/app/core
+WORKDIR /home/app
 
 RUN apt update && apt install -y \
+    autoconf \
+    gawk \
+    libreadline-dev \
+    libtool \
     python3.6 \
     python3-pip
-RUN    cd /home/app && \
-    pip3 install -r core/daemon/requirements.txt
 
-RUN apt install -y \
-    libtool \
-    libreadline-dev \
-    autoconf gawk
+RUN curl \
+    -o requirements.txt "https://raw.githubusercontent.com/coreemu/core/master/daemon/requirements.txt" \
+    -O -L "https://github.com/coreemu/core/releases/download/release-6.0.0/core_6.0.0_amd64.deb"
 
-# COPY --chown=app:app src/ospf-mdr /home/app/ospf-mdr
+RUN pip3 install -r requirements.txt  
 
-RUN cd /home/app && \
-    git clone https://github.com/USNavalResearchLaboratory/ospf-mdr
+RUN git clone https://github.com/USNavalResearchLaboratory/ospf-mdr
 
-RUN cd /home/app/ospf-mdr && \
-    ./bootstrap.sh && \
+WORKDIR /home/app/ospf-mdr
+
+RUN ./bootstrap.sh && \
     ./configure --disable-doc --enable-user=root --enable-group=root --with-cflags=-ggdb \
     --sysconfdir=/usr/local/etc/quagga --enable-vtysh \
     --localstatedir=/var/run/quagga && \
     make && \
     make install
 
-COPY --chown=app:app src/core_6.0.0_amd64.deb /home/app/core_6.0.0_amd64.deb
+WORKDIR /home/app
 
-RUN apt install -y ./home/app/core_6.0.0_amd64.deb
+RUN apt update && \
+    apt install -y ./core_6.0.0_amd64.deb
 
 # When done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
