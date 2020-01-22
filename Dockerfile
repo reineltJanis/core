@@ -1,12 +1,18 @@
-FROM phusion/passenger-full:1.0.9
+FROM phusion/passenger-customizable:1.0.9
 
+# Configuring passenger
 ENV HOME /root
 
 CMD ["/sbin/my_init"]
 
+RUN /pd_build/python.sh
+
+# Installing Core
+
 WORKDIR /home/app
 
-RUN apt update && apt install -y \
+RUN apt update && \
+    apt-get update && apt install -y \
     autoconf \
     gawk \
     libreadline-dev \
