@@ -21,8 +21,8 @@ RUN apt update && \
     python3-pip
 
 RUN curl \
-    -o requirements.txt "https://raw.githubusercontent.com/coreemu/core/master/daemon/requirements.txt" \
-    -O -L "https://github.com/coreemu/core/releases/download/release-6.0.0/core_6.0.0_amd64.deb"
+    -O -L "https://github.com/coreemu/core/releases/download/release-5.5.2/requirements.txt" \
+    -O -L "https://github.com/coreemu/core/releases/download/release-5.5.2/core_python3_5.5.2_amd64.deb"
 
 RUN pip3 install -r requirements.txt  
 
@@ -40,7 +40,7 @@ RUN ./bootstrap.sh && \
 WORKDIR /home/app
 
 RUN apt update && \
-    apt install -y ./core_6.0.0_amd64.deb
+    apt install -y ./core_python3_5.5.2_amd64.deb
 
 # When done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -52,6 +52,6 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 # Set-Variable -name DISPLAY -value YOUR_IP:0.0
 # docker run -ti --rm -e DISPLAY=$DISPLAY --name core IMG_NAME
 
-ENTRYPOINT /etc/init.d/core-daemon start && \
-    sleep 5 && \
-    core-gui --address 127.0.0.1 --port 4038
+# ENTRYPOINT service core-daemon start \& && \
+#     sleep 5 && \
+#     core-gui --address 127.0.0.1 --port 4038
